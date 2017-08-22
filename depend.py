@@ -104,7 +104,7 @@ class DiGraph():
         """
         >>> dg = DiGraph()
         >>> dg.addEdges([1, 2, 3], [4, 5, 6])
-        >>> dg.showDot()
+        >>> print dg.showDot(),
         digraph {
             1 -> {4 5 6}
             2 -> {4 5 6}
@@ -117,21 +117,53 @@ class DiGraph():
         >>> dg.roots()
         [1, 2, 3]
         """
-        print "digraph {"
+        s = ""
+        s += "digraph {\n"
         for b, ends in self.d.iteritems():
-            print "    %s -> {%s}" % (b, " ".join([str(i) for i in ends]))
-        print "}"
+            s += "    %s -> {%s}\n" % (b, " ".join([str(i) for i in ends]))
+        s += "}\n"
+        return s
+
+    def showDotWithSt(self, st):
+        fullst = {k: False for k in self.vertexs() if k not in st.keys()}
+        fullst.update(st)
+        s = ""
+        s += "digraph {\n"
+        for k, v in fullst.iteritems():
+            if not v:
+                s += '    %s [style = "filled" fillcolor = "gray"]\n' % (k)
+        for b, ends in self.d.iteritems():
+            s += "    %s -> {%s}\n" % (b, " ".join([str(i) for i in ends]))
+        s += "}\n"
+        return s
 
     def tsort(self):
         """
-        # >>> dg.addEdge(2, 0)
+
+                [[0, 1], [1, 2], [2, 3], [2, 0]]
+        topological sorting on DiGraph
+        return vertexes, and residual edges if have circle in graph
         >>> dg = DiGraph()
         >>> dg.addEdge(0, 1)
         >>> dg.addEdge(1, 2)
         >>> dg.addEdge(2, 3)
         >>> dg.addEdge(4, 2)
-        >>> dg.topo()
+        >>> L, cg = dg.tsort()
+        >>> L
         [4, 0, 1, 2, 3]
+        >>> dg.addEdge(2, 0)
+        >>> L, cg = dg.tsort()
+        >>> L
+        [4]
+        >>> dg.chkCircle()
+        True
+        >>> print cg.showDot(),
+        digraph {
+            0 -> {1}
+            1 -> {2}
+            2 -> {3 0}
+            4 -> {}
+        }
         """
         dg = deepcopy(self)
         L = []
@@ -144,21 +176,57 @@ class DiGraph():
             for m in M:
                 if dg.degreeIn(m) == 0:
                     S.append(m)
-        if len(dg.edges()) != 0:
-            # print dg.d
-            # raise Exception('find cycle in DiGraph')
-            return []
-        return L
+        return L, dg
+        # if len(dg.edges()) != 0:
+        # print dg.d
+        # raise Exception('find cycle in DiGraph')
+        #     return []
+        # return L
 
+    def chkCircle(self):
+        _, cg = self.tsort()
+        return len(cg.edges()) != 0
 
 
 class DependTbl():
 
-    def __init__():
+    def __init__(self):
         self.dg = DiGraph()
 
-    def dep(xs, ys):
-        self.dg.addEdges(xy, ys)
+    def dep(self, xs, ys):
+        self.dg.addEdges(xs, ys)
 
-    def chkCycle():
-        pass
+    def load(self, d):
+        for k, v in d.iteritems():
+            self.dep([k], v)
+
+    def showDot(self):
+        return self.dg.showDot()
+
+    def showDotWithSt(self, st):
+        return self.dg.showDotWithSt(st)
+
+    def chkCircle(self):
+        return self.dg.chkCircle()
+
+    def chkDep(self, st):
+        ret = {}
+        for k, v in st.iteritems():
+            if not v:
+                continue
+            vs = self.dg.dfs(k)
+            unmeet = [i for i in vs if i not in st or not st[i]]
+            if len(unmeet) != 0:
+                ret[k] = unmeet
+        return ret
+
+
+def printDep(unmeetDct):
+    for k, v in unmeetDct.iteritems():
+        print "find dependency confict, when try to enable '%s' feature" % (k)
+        print "    cfg['%s'] = %s" % (k, False)
+        print "---- or ----"
+        for i in v:
+            print "    cfg['%s'] = %s" % (i, True)
+    else:
+        print "all dependency is meeted"
