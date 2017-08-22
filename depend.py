@@ -4,7 +4,7 @@ from collections import defaultdict
 from copy import deepcopy
 
 
-class DiGraph():
+class DiGraph:
 
     def __init__(self):
         self.d = defaultdict(list)
@@ -82,7 +82,7 @@ class DiGraph():
         return r
 
     def vertexOut(self, v):
-        return self.d
+        return self.d[v]
 
     def vertexIn(self, v):
         r = []
@@ -112,6 +112,8 @@ class DiGraph():
         }
         >>> dg.vertexIn(4)
         [1, 2, 3]
+        >>> dg.vertexOut(2)
+        [4, 5, 6]
         >>> dg.degreeIn(4)
         3
         >>> dg.roots()
@@ -188,7 +190,7 @@ class DiGraph():
         return len(cg.edges()) != 0
 
 
-class DependTbl():
+class DependTbl:
 
     def __init__(self):
         self.dg = DiGraph()
@@ -228,5 +230,5 @@ def printDep(unmeetDct):
         print "---- or ----"
         for i in v:
             print "    cfg['%s'] = %s" % (i, True)
-    else:
+    if len(unmeetDct) == 0:
         print "all dependency is meeted"
