@@ -4,7 +4,7 @@ from collections import defaultdict
 from copy import deepcopy
 
 
-class DiGraph:
+class DiGraph(object):
 
     def __init__(self):
         self.d = defaultdict(list)
@@ -190,7 +190,7 @@ class DiGraph:
         return len(cg.edges()) != 0
 
 
-class DependTbl:
+class DependTbl(object):
 
     def __init__(self):
         self.dg = DiGraph()
