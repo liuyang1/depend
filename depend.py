@@ -5,32 +5,53 @@ from copy import deepcopy
 
 
 class DiGraph(object):
+    """
+    Directed Grapah
+    """
 
     def __init__(self):
+        """
+        self.d :: {source vertex: [destination vertexes]}
+        self.v :: {[vertexes]}
+        """
         self.d = defaultdict(list)
         self.v = []
 
-    def vertexs(self):
+    def vertexes(self):
+        """
+        return all vertexes
+        self -> [vertex]
+        """
         return self.v
 
-    def addVertexs(self, vs):
+    def addVertexes(self, vs):
+        """
+        add vertexes to Directed Graph
+        self -> [vertex] -> None
+        """
         for v in vs:
             self.addVertex(v)
 
     def addVertex(self, v):
         """
+        add vertex to Directed Graph
+        self -> vertex -> None
         >>> dg = DiGraph()
         >>> dg.addVertex(1)
-        >>> dg.vertexs()
+        >>> dg.vertexes()
         [1]
-        >>> dg.addVertexs([1, 2, 3])
-        >>> dg.vertexs()
+        >>> dg.addVertexes([1, 2, 3])
+        >>> dg.vertexes()
         [1, 2, 3]
         """
         if v not in self.v:
             self.v.append(v)
 
     def edges(self):
+        """
+        return all edges
+        self -> [(source vertex, destination vertex)]
+        """
         r = []
         for b, ends in self.d.iteritems():
             for e in ends:
@@ -38,15 +59,21 @@ class DiGraph(object):
         return r
 
     def addEdges(self, bgns, ends):
+        """
+        add edges to Directed Graph
+        self -> [source vertex] -> [destination vertex] -> None
+        """
         for b in bgns:
             for e in ends:
                 self.addEdge(b, e)
 
     def addEdge(self, bgn, end):
         """
+        add edge to Directed Graph
+        self -> source vertex -> destionation vertex -> None
         >>> dg = DiGraph()
         >>> dg.addEdges([1, 2], [4, 5, 6])
-        >>> dg.vertexs()
+        >>> dg.vertexes()
         [1, 4, 5, 6, 2]
         >>> dg.edges()
         [[1, 4], [1, 5], [1, 6], [2, 4], [2, 5], [2, 6]]
@@ -82,9 +109,17 @@ class DiGraph(object):
         return r
 
     def vertexOut(self, v):
+        """
+        return all vertexes from v
+        self -> source vertex -> [destionation vertex]
+        """
         return self.d[v]
 
     def vertexIn(self, v):
+        """
+        return all vertexes to v
+        self -> destination vertex -> [source vertex]
+        """
         r = []
         for b, ends in self.d.iteritems():
             if v in ends:
@@ -92,16 +127,29 @@ class DiGraph(object):
         return r
 
     def degreeOut(self, v):
+        """
+        return number of vertexes from v
+        self -> source vertex -> Int
+        """
         return len(self.d[v])
 
     def degreeIn(self, v):
+        """
+        return number of vertexes to v
+        self -> destination vertex -> Int
+        """
         return len(self.vertexIn(v))
 
     def roots(self):
-        return [i for i in self.vertexs() if self.degreeIn(i) == 0]
+        """
+        return vertexes in Graph which in-degree is zero
+        self -> [vertex]
+        """
+        return [i for i in self.vertexes() if self.degreeIn(i) == 0]
 
     def showDot(self):
         """
+        self -> string
         >>> dg = DiGraph()
         >>> dg.addEdges([1, 2, 3], [4, 5, 6])
         >>> print dg.showDot(),
@@ -127,7 +175,7 @@ class DiGraph(object):
         return s
 
     def showDotWithSt(self, st):
-        fullst = {k: False for k in self.vertexs() if k not in st.keys()}
+        fullst = {k: False for k in self.vertexes() if k not in st.keys()}
         fullst.update(st)
         s = ""
         s += "digraph {\n"
@@ -141,10 +189,9 @@ class DiGraph(object):
 
     def tsort(self):
         """
-
-                [[0, 1], [1, 2], [2, 3], [2, 0]]
         topological sorting on DiGraph
         return vertexes, and residual edges if have circle in graph
+        self -> ([vertex], DiGraph)
         >>> dg = DiGraph()
         >>> dg.addEdge(0, 1)
         >>> dg.addEdge(1, 2)
@@ -186,6 +233,9 @@ class DiGraph(object):
         # return L
 
     def chkCircle(self):
+        """
+        self -> Boolean
+        """
         _, cg = self.tsort()
         return len(cg.edges()) != 0
 
@@ -196,9 +246,15 @@ class DependTbl(object):
         self.dg = DiGraph()
 
     def dep(self, xs, ys):
+        """
+        self -> [vertex] -> [vertex] -> None
+        """
         self.dg.addEdges(xs, ys)
 
     def load(self, d):
+        """
+        self -> {source vertex: [destination vertex]} -> None
+        """
         for k, v in d.iteritems():
             self.dep([k], v)
 
@@ -212,6 +268,10 @@ class DependTbl(object):
         return self.dg.chkCircle()
 
     def chkDep(self, st):
+        """
+        return unmeet sub-graph with DICT type
+        self -> {vertex : Boolean} -> {source vertex: [destination vertex]}
+        """
         ret = {}
         for k, v in st.iteritems():
             if not v:
