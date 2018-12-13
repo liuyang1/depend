@@ -1,5 +1,30 @@
 #! /usr/bin/env python2
 
+"""
+## Internal Technology
+
+simple topological sort
+
+## How to visulize it?
+
+Use `graphviz` to visulize the dependency.
+
+We have two functions:
+
+- `showDot`
+
+    generate `dot` file format with dependency graph.
+
+- `showDotWithSt`
+
+    generate `dot` file format with dependency grapha, render disabled feature with gray color.
+
+When have `dot` file, we could generate the picture by this command:
+
+```
+dot -Tpng [file.dot] -o [file.png]
+```
+"""
 from collections import defaultdict
 from copy import deepcopy
 
@@ -285,7 +310,7 @@ class DependTbl(object):
 
 def printDep(unmeetDct):
     for k, v in unmeetDct.iteritems():
-        print "find dependency confict, when try to enable '%s' feature" % (k)
+        print "find dependency conflict, when try to enable '%s' feature" % (k)
         print "    cfg['%s'] = %s" % (k, False)
         print "---- or ----"
         for i in v:
